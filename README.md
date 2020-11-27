@@ -1,54 +1,65 @@
-# Include
-include is js lib which can include a html in a html.
+## Include
+Include is javascript lib which can include a html in a html. 
+The most important feature of this lib is that you can include a file which has the ability to include another file, it means the include action is recursive.
 
-# Quick start
 
-```js
+## Quick start
+
+```html
 <script src="include.js"></script>
-
 //do nothing just add an include tag in your html page
 <include src="components/a.html"></include>
-
-//or specify the page as the root page to load 
+```
+Or
+```html
+<script src="include.js"></script>
+<script>
+//specify the page as the root page to load 
 include.load("components/a.html");
-
-//load current page and add event listen
+</script>
+```
+Or
+```html
+<script src="include.js"></script>
+<script>
+//load current page and add event listener
 include.load().addLoadListeners(function(node){
     console.log("All include page has been loaded")
 })
-
+</script>
 ```
 
-# Example
+## Example
 
 ### index.html
-```js
+```html
 <script src="include.js"></script>
 root[<include src="components/a.html"></include>]
 ```
 ### a.html
-```js
+```html
 <script src="include.js"></script>
 a[<include src="components/b.html"></include>,<include src="components/c.html"></include>,<include src="components/e.html" /></include>]
 ```
 ### b.html
-```js
+```html
 b
 ```
 ### c.html
-```js
+```html
 c[<include src="components/d.html"></include>]
 ```
 ### d.html
-```js
+```html
 d[<include src="components/c.html"></include>]
 ```
 ### e.html
-```js
+```html
 e
 ```
 
-## Output in the index.html
-```js
+## Output 
+open index.html with chrome
+```html
 root[a[b,c[d[]],e]]
 ```
