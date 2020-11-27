@@ -33,6 +33,7 @@ include.load().addLoadListeners(function(node){
 
 ```html
 <!-- index.html -->
+
 <style>
   div{
     border: 5px solid red;
@@ -49,27 +50,37 @@ include.load().addLoadListeners(function(node){
   root
   <include src="components/a.html"></include>
 </div>
-<!-- a.html -->
+
+<!-- a.html is the root page-->
+
 <div style='border-color:black;color:black'>
   a
   <include src="components/b.html"></include>
   <include src="components/c.html"></include>
   <include src="components/e.html"/>
 </div>
+
 <!-- b.html -->
+
 <div style='border-color:green;color:green'>
   b
 </div>
+
 <!-- c.html -->
+
 <div style='border-color:gray;color:gray'>c
   <include src="components/d.html"></include>
 </div>
+
 <!-- d.html -->
+
 <div style='border-color:blue;color:blue'>
   d
   <include src="components/c.html"></include>
 </div>
+
 <!-- e.html -->
+
 <div style='border-color:rgb(161, 79, 141);color:rgb(161, 79, 141)'>
   e
 </div>
