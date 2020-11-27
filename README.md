@@ -38,7 +38,6 @@ root[<include src="components/a.html"></include>]
 ```
 ### a.html
 ```html
-<script src="include.js"></script>
 a[<include src="components/b.html"></include>,<include src="components/c.html"></include>,<include src="components/e.html" /></include>]
 ```
 ### b.html
