@@ -31,34 +31,50 @@ include.load().addLoadListeners(function(node){
 
 ## Example
 
-### index.html
 ```html
+<!-- index.html -->
+<style>
+  div{
+    border: 5px solid red;
+    border-radius: 10px;
+    color:red;
+    padding:10px 10px;
+    margin:10px 10px;
+    font-size: 30px;
+    width: 75%;
+  }
+</style>
 <script src="include.js"></script>
-root[<include src="components/a.html"></include>]
-```
-### a.html
-```html
-a[<include src="components/b.html"></include>,<include src="components/c.html"></include>,<include src="components/e.html" /></include>]
-```
-### b.html
-```html
-b
-```
-### c.html
-```html
-c[<include src="components/d.html"></include>]
-```
-### d.html
-```html
-d[<include src="components/c.html"></include>]
-```
-### e.html
-```html
-e
+<div>
+  root
+  <include src="components/a.html"></include>
+</div>
+<!-- a.html -->
+<div style='border-color:black;color:black'>
+  a
+  <include src="components/b.html"></include>
+  <include src="components/c.html"></include>
+  <include src="components/e.html"/>
+</div>
+<!-- b.html -->
+<div style='border-color:green;color:green'>
+  b
+</div>
+<!-- c.html -->
+<div style='border-color:gray;color:gray'>c
+  <include src="components/d.html"></include>
+</div>
+<!-- d.html -->
+<div style='border-color:blue;color:blue'>
+  d
+  <include src="components/c.html"></include>
+</div>
+<!-- e.html -->
+<div style='border-color:rgb(161, 79, 141);color:rgb(161, 79, 141)'>
+  e
+</div>
 ```
 
 ## Output 
 open index.html with chrome
-```html
-root[a[b,c[d[]],e]]
-```
+![output_of_include](example.jpg)
