@@ -22,7 +22,7 @@
 
     class Node {
       constructor(path) {
-        if (path && path.trim().length == 0) {
+        if (!path || (path && path.trim().length == 0)) {
           console.assert(false, "Node src is empty")
         }
         //status of the node
@@ -209,7 +209,7 @@
       node.addCompletelyLoadListeners(function (n) {
         const html = Node.treeToString(n)
         document.write(html)
-        //console.log(html)
+        log(html)
       })
       return node;
     }
