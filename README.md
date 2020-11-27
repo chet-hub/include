@@ -32,7 +32,7 @@ include.load().addLoadListeners(function(node){
 ## Example
 
 ```html
-<!-- index.html -->
+<!-- index.html is a root page containning other pages -->
 
 <style>
   div{
@@ -51,7 +51,7 @@ include.load().addLoadListeners(function(node){
   <include src="components/a.html"></include>
 </div>
 
-<!-- a.html is the root page-->
+<!-- a.html -->
 
 <div style='border-color:black;color:black'>
   a
