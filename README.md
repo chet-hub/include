@@ -7,7 +7,7 @@ The most important feature of this lib is that you can include a file which has 
 
 ```html
 <script src="include.js"></script>
-//do nothing just add an include tag in your html page
+//do nothing coding and just add an include tag in your html page
 <include src="components/a.html"></include>
 ```
 Or
@@ -68,7 +68,8 @@ include.load().addLoadListeners(function(node){
 
 <!-- c.html -->
 
-<div style='border-color:gray;color:gray'>c
+<div style='border-color:gray;color:gray'>
+  c
   <include src="components/d.html"></include>
 </div>
 
@@ -86,6 +87,6 @@ include.load().addLoadListeners(function(node){
 </div>
 ```
 
-## Output 
+#### Output 
 open index.html with chrome
 ![output_of_include](example.jpg)
