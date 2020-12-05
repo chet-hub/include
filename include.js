@@ -33,7 +33,7 @@ class Tag {
     }
 }
 
-Tag.prototype.requestFunction = function (path, fn) {
+Tag.prototype.requestFunction = function (attribute, fn) {
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
@@ -41,7 +41,7 @@ Tag.prototype.requestFunction = function (path, fn) {
                 fn(this.responseText);
         }
     };
-    xhttp.open("GET", path + "?time=" + new Date().getTime(), true);
+    xhttp.open("GET", attribute.src + "?time=" + new Date().getTime(), true);
     xhttp.send();
 }
 
@@ -98,7 +98,7 @@ class Node {
         //require value
         this.tag = tag;
         //content
-        this.parsedContent = []; //[string,tag,string,tag,string,tag]
+        this.contentArray = []; //[string,tag,string,tag,string,tag]
         //inherit
         this.parent = parent;
         this.children = [];  // [node, node, node...]
@@ -169,7 +169,7 @@ class Node {
             if (!(node instanceof Node) || !node.isLoad || node.isValid === false) return ""
             let i = 0;
             node.onToString(node.tag)
-            return node.contentArray.reduce(function (context, value) {
+            const result =  node.contentArray.reduce(function (context, value) {
                 if (value instanceof String) {
                     context.push(value)
                 } else if (value instanceof Tag) {
@@ -180,6 +180,7 @@ class Node {
                 }
                 return context;
             }, []).join("");
+            return result;
         }
         return treeToString(this);
     }
@@ -312,32 +313,29 @@ Node.addListener = function (event, fn) {
     }
 }
 
-Node.removeListener = function (eventName, fn) {
-    const listeners = Node.prototype["on" + eventName + "Listeners"];
-    listeners.splice(listeners.findIndex(function (v) {
-        return v === fn
-    }), 1)
-}
-
 
 const include = {
+    event:Node.event,
     addListener:function (event,fn){
         Node.addListener(event,fn)
         return this;
     },
-    toString:function(){
+    done:function(cb){
         const tag = new Tag();
-        const node = new Node(tag);
-        node.include();
-        //node.printTree();
-        return node.toString();
-    },
-    event:Node.event
+        const root = new Node(tag);
+        root.include();
+        //root.printTree();
+        include.addListener(include.event.AfterCompletelyLoaded, function (n) {
+            if(n === root){
+                cb(root.toString())
+            }
+        })
+    }
 }
 
 
-/////////////////////////////////////////////
-
+/////////////////test////////////////////////////
+//
 // const data = {
 //     root: `root[<include src="node1" id="1" />,<include src="node4" id="2"/>]`,
 //     node1: `node1[<include src="node2" id="3"/>,<include src="node3" id="4"/>]`,
@@ -345,58 +343,68 @@ const include = {
 //     node3: `node3[<include src="node1" id="6"/>]`,
 //     node4: `node4`,
 // }
+//
+// const data = {
+//     root: `root[<include src="node1" id="1" />]`,
+//     node1: `node1[<include src="node2" id="2"/>`,
+//     node2: `node2[<include src="node3" id="3"/>]`,
+//     node3: `node3[<include src="node2" id="4"/>]`
+// }
+//
+//
+// const requestFunction = function (attribute, callback) {
+//     let content;
+//     if (attribute.src) {
+//         content = data[attribute.src]
+//     } else {
+//         content = data.root
+//     }
+//     //setTimeout(callback,2000,content)
+//     callback(content)
+// }
+//
+// include.addListener(include.event.SetRequestFunction, function (tag){
+//     return requestFunction
+// })
+//
+// include.addListener(include.event.BeforeRequest, function (tag) {
+//     console.log("BeforeRequest:\t\t" + JSON.stringify(tag));
+// })
+//
+// include.addListener(include.event.AfterRequest, function (node) {
+//     console.log("AfterRequest:\t\t" + JSON.stringify(node.tag));
+// })
+//
+// include.addListener(include.event.AfterLoaded, function (tag, contentArray) {
+//     console.log("AfterLoaded:\t\t" + JSON.stringify(contentArray));
+// })
+//
+// include.addListener(include.event.AfterChildAdded, function (child, index) {
+//     console.log("AfterChildAdded:\t[" + index + "]" + JSON.stringify(child.tag));
+// })
+//
+// include.addListener(include.event.AfterCompletelyLoaded, function (node) {
+//     console.log("AfterCompletelyLoaded:\t" + JSON.stringify(node.tag));
+// })
+//
+// include.addListener(Node.event.ToString, function (tag) {
+//     console.log("ToString:\t\t" + JSON.stringify(tag));
+// })
+//
+// include.done();
+/////////////////test////////////////////////////
 
-const data = {
-    root: `root[<include src="node1" id="1" />]`,
-    node1: `node1[<include src="node2" id="2"/>`,
-    node2: `node2[<include src="node3" id="3"/>]`,
-    node3: `node3[<include src="node2" id="4"/>]`
-}
-
-
-const requestFunction = function (attribute, callback) {
-    let content;
-    if (attribute.src) {
-        content = data[attribute.src]
-    } else {
-        content = data.root
-    }
-    //setTimeout(callback,2000,content)
-    callback(content)
-}
-
-include.addListener(include.event.SetRequestFunction, function (tag){
-    return requestFunction
+window.addEventListener('DOMContentLoaded', (event) => {
+    include.addListener(include.event.SetRequestFunction, function (tag){
+        if(tag.tagContent === ''){
+            return function (attribute, callback) {
+                //setTimeout(callback,1000,document.documentElement.innerHTML)
+                callback(document.documentElement.innerHTML)
+            }
+        }
+    }).done(function (result){
+        console.log(result)
+        document.documentElement.innerHTML = result;
+    })
 })
-
-include.addListener(include.event.BeforeRequest, function (tag) {
-    console.log("BeforeRequest:\t\t" + JSON.stringify(tag));
-})
-
-include.addListener(include.event.AfterRequest, function (node) {
-    console.log("AfterRequest:\t\t" + JSON.stringify(node.tag));
-})
-
-include.addListener(include.event.AfterLoaded, function (tag, contentArray) {
-    console.log("AfterLoaded:\t\t" + JSON.stringify(contentArray));
-})
-
-include.addListener(include.event.AfterChildAdded, function (child, index) {
-    console.log("AfterChildAdded:\t[" + index + "]" + JSON.stringify(child.tag));
-})
-
-include.addListener(include.event.AfterCompletelyLoaded, function (node) {
-    console.log("AfterCompletelyLoaded:\t" + JSON.stringify(node.tag));
-})
-
-include.addListener(Node.event.ToString, function (tag) {
-    console.log("ToString:\t\t" + JSON.stringify(tag));
-})
-
-include.toString();
-
-
-
-
-
 
