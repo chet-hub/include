@@ -6,27 +6,26 @@ The most important feature of this lib is that you can include a file which has 
 ## Quick start
 
 ```html
-<script src="include.js"></script>
 //do nothing coding and just add an include tag in your html page
-<include src="components/a.html"></include>
-```
-Or
-```html
-<script src="include.js"></script>
-<script>
-//specify the page as the root page to load 
-include.load("components/a.html");
-</script>
-```
-Or
-```html
-<script src="include.js"></script>
-<script>
-//load current page and add event listener
-include.load().addLoadListeners(function(node){
-    console.log("All include page has been loaded")
-})
-</script>
+<html>
+<head>
+    <script src="include.js"></script>
+</head>
+<body>
+<style>
+    div {
+        border: 5px solid red;
+        border-radius: 10px;
+        color: red;
+        padding: 10px 10px;
+        margin: 10px 10px;
+        font-size: 30px;
+        width: 75%;
+    }
+</style>
+<div>root<include src="components/a.html"></include></div>
+</body>
+</html>
 ```
 
 ## Example
