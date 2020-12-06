@@ -34,7 +34,14 @@ class Tag {
 }
 
 Tag.prototype.requestFunction = function (attribute, fn) {
-    const xhttp = new XMLHttpRequest();
+    let xhttp;
+    if (window.XMLHttpRequest) {
+        // code for modern browsers
+        xhttp = new XMLHttpRequest();
+    } else {
+        // code for old IE browsers
+        xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
     xhttp.onreadystatechange = function () {
         if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
             if (fn instanceof Function)
@@ -395,16 +402,17 @@ const include = {
 /////////////////test////////////////////////////
 
 window.addEventListener('DOMContentLoaded', (event) => {
-    include.addListener(include.event.SetRequestFunction, function (tag){
-        if(tag.tagContent === ''){
+    include.addListener(include.event.SetRequestFunction, function (tag) {
+        if (tag.tagContent === '') {
             return function (attribute, callback) {
-                //setTimeout(callback,1000,document.documentElement.innerHTML)
                 callback(document.documentElement.innerHTML)
             }
         }
-    }).done(function (result){
-        console.log(result)
-        document.documentElement.innerHTML = result;
+    }).done(function (result) {
+        document.open()
+        document.write(result)
+        document.close()
     })
 })
+
 
