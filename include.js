@@ -7,7 +7,7 @@ class Tag {
         this.content = null;
     }
 
-    config(requestFunction,parseTagFunction,parseContentFunction) {
+    config(requestFunction, parseTagFunction, parseContentFunction) {
         if (requestFunction instanceof Function) {
             this.requestFunction = requestFunction;
         }
@@ -126,7 +126,7 @@ class Node {
                 } else {
                     node.contentArray = node.tag.parseContent(content)
                 }
-                node.onAfterLoaded(node.tag, node.contentArray);
+                node.onAfterLoaded(node);
                 node.contentArray.filter(function (v) {
                     return v instanceof Tag
                 }).forEach(function (tag) {
@@ -176,7 +176,7 @@ class Node {
             if (!(node instanceof Node) || !node.isLoad || node.isValid === false) return ""
             let i = 0;
             node.onToString(node.tag)
-            const result =  node.contentArray.reduce(function (context, value) {
+            const result = node.contentArray.reduce(function (context, value) {
                 if (value instanceof String) {
                     context.push(value)
                 } else if (value instanceof Tag) {
@@ -191,7 +191,8 @@ class Node {
         }
         return treeToString(this);
     }
-    onAfterRequest(node){
+
+    onAfterRequest(node) {
         this.onAfterRequestListeners.forEach(function (listener) {
             listener(node)
         })
@@ -204,13 +205,13 @@ class Node {
         })
     }
 
-    onAfterLoaded(tag, contentArray) {
+    onAfterLoaded(node) {
         //add content to the node and parse the content
         this.isLoad = true;
         //fire listener
         if (this.isValid) {
             this.onAfterLoadedListeners.forEach(function (listener) {
-                listener(tag, contentArray)
+                listener(node)
             })
         }
         if (!this.isValid) {
@@ -220,7 +221,7 @@ class Node {
         // []                       invalid node
         // [string]                 leaf Node
         // [string tag string tag]  not Leaf node
-        const isLeafNode = (contentArray.length === 1)
+        const isLeafNode = (node.contentArray.length === 1)
         if (isLeafNode || !this.isValid) {//leaf Node
             const fireCompletelyLoad = function (node) {
                 node.onAfterCompletelyLoaded(node);
@@ -253,7 +254,7 @@ class Node {
         if (this.onSetParseContentFunction instanceof Function) {
             const fn = this.onSetParseContentFunction(tag)
             if (fn instanceof Function) {
-                this.tag.config(null,null, fn)
+                this.tag.config(null, null, fn)
             }
         }
     }
@@ -322,18 +323,18 @@ Node.addListener = function (event, fn) {
 
 
 const include = {
-    event:Node.event,
-    addListener:function (event,fn){
-        Node.addListener(event,fn)
+    event: Node.event,
+    addListener: function (event, fn) {
+        Node.addListener(event, fn)
         return this;
     },
-    done:function(cb){
+    done: function (cb) {
         const tag = new Tag();
         const root = new Node(tag);
         root.include();
         //root.printTree();
         include.addListener(include.event.AfterCompletelyLoaded, function (n) {
-            if(n === root){
+            if (n === root) {
                 cb(root.toString())
             }
         })
@@ -408,10 +409,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 callback(document.documentElement.innerHTML)
             }
         }
+    }).addListener(include.event.AfterLoaded, function (node) {
+
     }).done(function (result) {
-        document.open()
-        document.write(result)
-        document.close()
+        document.documentElement.innerHTML = result
+        Array.from(document.querySelectorAll("script")).forEach(function (code){
+            eval(code.text);
+        })
     })
 })
 
