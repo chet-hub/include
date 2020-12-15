@@ -44,8 +44,8 @@ loaded.addListener(include.event.SetRequestFunction, function (tag){
     console.log("AfterCompletelyLoaded:\t" + JSON.stringify(node.tag));
 }).addListener(include.event.ToString, function (data) {
     console.log("ToString:\t\t" + JSON.stringify(data.doc));
-}).done(function(doc){
-    console.log(doc)
+}).done(function(node){
+    console.log("Done")
 });
 
 

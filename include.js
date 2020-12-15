@@ -23,6 +23,7 @@
             } else {
                 this["on" + event + "Listeners"].push(fn)
             }
+            return this;
         }
     }
 
@@ -48,7 +49,7 @@
         }
 
         requestContent(callback) {
-            this.attribute = this.parseTagFunction(this.tagContent);
+            Object.assign(this.attribute, this.parseTagFunction(this.tagContent));
             const that = this;
             this.requestFunction(this.attribute, function (content) {
                 that.content = content;
@@ -370,24 +371,12 @@
 
             //init Listeners in node and browser
             if (exports.isBrowser) {//default
-                window.addEventListener('DOMContentLoaded', (event) => {
-                    listeners.addListener(include.event.SetRequestFunction, function (tag) {
-                        if (tag.tagContent === '') {
-                            if (src) {//use default requestFunction
-                                return null
-                            } else {
-                                return function (attribute, callback) {
-                                    callback(document.documentElement.innerHTML)
-                                }
-                            }
+                listeners.addListener(include.event.SetRequestFunction, function (tag) {
+                    if (tag.tagContent === '') {
+                        return function (attribute, callback) {
+                            callback(document.documentElement.innerHTML)
                         }
-                    }).done(function (result) {// there will be a problem if include js code
-                        //todo
-                        document.documentElement.innerHTML = result
-                        Array.from(document.querySelectorAll("script")).forEach(function (code) {
-                            eval(code.text);
-                        })
-                    })
+                    }
                 })
                 delete exports.isBrowser;
             } else {
@@ -420,8 +409,12 @@
                     return this;
                 },
                 done: function (cb) {
+                    listeners.addListener(include.event.ToString,function (data){
+                        if(data.node.isRoot){
+                            cb(data);
+                        }
+                    })
                     root.include();
-                    cb(root);
                 }
             }
         }
@@ -429,6 +422,17 @@
 
     exports.event = include.event;
     exports.load = include.load;
+
+    if (exports.isBrowser){
+        window.addEventListener('DOMContentLoaded', (event) => {
+            include.load().done(function (result) {
+                document.documentElement.innerHTML = result.doc
+                Array.from(document.querySelectorAll("script")).forEach(function (code){
+                    eval(code.text);
+                })
+            })
+        })
+    }
 
 })(typeof exports === 'undefined' ? this['include'] = {isBrowser: true} : exports);
 
